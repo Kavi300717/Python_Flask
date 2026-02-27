@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">👥</div>
+            <h1>User Management System</h1>
+            <p>Add, view, and manage user records with ease</p>
+        </div>
+
+        <!-- Add User Form -->
+        <div class="card">
+            <h2 class="card-title">
+                <span class="icon">➕</span> Add New User
+            </h2>
+            <form method="POST" action="/">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Full Name <span class="required">*</span></label>
+                        <input type="text" id="name" name="name" placeholder="e.g. Priya Sharma" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="e.g. priya@company.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" placeholder="e.g. +91 98765 43210">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" name="department">
+                            <option value="">-- Select Department --</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Design">Design</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Sales">Sales</option>
+                            <option value="HR">HR</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Operations">Operations</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <span>➕</span> Add User
+                </button>
+            </form>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card">
+            <h2 class="card-title">
+                <span class="icon">📋</span> All Users
+                <span class="user-count">{{ users|length }} record{{ 's' if users|length != 1 else '' }}</span>
+            </h2>
+
+            {% if users %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Department</th>
+                            <th>Added On</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td><span class="id-badge">#{{ user['id'] }}</span></td>
+                            <td><strong>{{ user['name'] }}</strong></td>
+                            <td><a href="mailto:{{ user['email'] }}" class="email-link">{{ user['email'] }}</a></td>
+                            <td>{{ user['phone'] if user['phone'] else '—' }}</td>
+                            <td>
+                                {% if user['department'] %}
+                                <span class="dept-badge">{{ user['department'] }}</span>
+                                {% else %}
+                                <span class="no-dept">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="date-cell">{{ user['created_at'][:10] if user['created_at'] else '—' }}</td>
+                            <td>
+                                <form method="POST" action="/delete/{{ user['id'] }}" onsubmit="return confirm('Delete this user?')">
+                                    <button type="submit" class="btn-delete">🗑 Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>No users yet. Add your first user above!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Built with Python + Flask + SQLite </p>
+        </div>
+    </div>
+
+</body>
+</html>
