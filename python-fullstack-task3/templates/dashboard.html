@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – Student CRUD</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+  <span class="brand">🎓 StudentCRUD</span>
+  <div class="nav-links">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/students">Students</a>
+    <a href="/add-student">Add Student</a>
+    <a href="/logout">Logout</a>
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-box">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="container">
+  <div class="welcome-card">
+    <h2>👋 Hello, {{ username }}!</h2>
+    <p>Manage your student records from this dashboard.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ count }}</div>
+      <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat-card" style="border-top-color: #16a34a;">
+      <div class="stat-number" style="color:#16a34a;">✓</div>
+      <div class="stat-label">Authenticated Session</div>
+    </div>
+    <div class="stat-card" style="border-top-color: #d97706;">
+      <div class="stat-number" style="color:#d97706;">4</div>
+      <div class="stat-label">CRUD Operations</div>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <a href="/students"     class="btn btn-primary">📋 View All Students</a>
+    <a href="/add-student"  class="btn btn-secondary">➕ Add New Student</a>
+    <a href="/logout"       class="btn btn-secondary">🔒 Logout</a>
+  </div>
+</div>
+
+</body>
+</html>

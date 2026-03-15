@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Students – Student CRUD</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+  <span class="brand">🎓 StudentCRUD</span>
+  <div class="nav-links">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/students">Students</a>
+    <a href="/add-student">Add Student</a>
+    <a href="/logout">Logout</a>
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-box">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="container">
+  <div class="page-header">
+    <h1>All Students</h1>
+    <a href="/add-student" class="btn btn-primary">➕ Add Student</a>
+  </div>
+
+  <div class="table-card">
+    {% if students %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td><span class="badge">{{ s['id'] }}</span></td>
+            <td><strong>{{ s['name'] }}</strong></td>
+            <td>{{ s['email'] }}</td>
+            <td>{{ s['course'] }}</td>
+            <td>
+              <div class="actions">
+                <a href="/edit/{{ s['id'] }}" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                <a href="/delete/{{ s['id'] }}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Delete {{ s['name'] }}? This cannot be undone.')">
+                  🗑️ Delete
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">
+        <div class="icon">🎓</div>
+        <p>No students yet. <a href="/add-student">Add the first one!</a></p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+</body>
+</html>
