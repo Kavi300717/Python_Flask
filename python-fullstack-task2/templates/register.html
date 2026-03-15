@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register – User Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-split">
+
+        <!-- Left panel -->
+        <div class="auth-panel">
+            <div class="auth-brand">
+                <div class="brand-mark">UM</div>
+                <span class="brand-name">UserBase</span>
+            </div>
+            <div class="auth-hero">
+                <h1>Join the<br><em>platform today.</em></h1>
+                <p>Create your account and start managing user data in minutes.</p>
+                <div class="feature-pills">
+                    <span>🔐 Secure Auth</span>
+                    <span>📋 User Records</span>
+                    <span>⚡ Fast SQLite</span>
+                </div>
+            </div>
+            <div class="auth-panel-deco">
+                <div class="deco-circle c1"></div>
+                <div class="deco-circle c2"></div>
+                <div class="deco-circle c3"></div>
+            </div>
+        </div>
+
+        <!-- Right form -->
+        <div class="auth-form-side">
+            <div class="auth-form-card">
+
+                <div class="form-header">
+                    <h2>Create account</h2>
+                    <p>Fill in the details below to get started</p>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    <div class="flash-stack">
+                      {% for cat, msg in messages %}
+                        <div class="flash flash-{{ cat }}">
+                          <span class="flash-icon">
+                            {% if cat == 'success' %}✅{% elif cat == 'error' %}❌{% elif cat == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+                          </span>
+                          {{ msg }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/register" class="auth-form">
+                    <div class="field">
+                        <label for="username">Username</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="username" name="username"
+                                   placeholder="min. 3 characters" required minlength="3" autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">✉️</span>
+                            <input type="email" id="email" name="email"
+                                   placeholder="you@example.com" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">🔑</span>
+                            <input type="password" id="password" name="password"
+                                   placeholder="min. 6 characters" required minlength="6" autocomplete="new-password">
+                            <button type="button" class="toggle-pw" onclick="togglePassword('password', this)">👁</button>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="confirm_password">Confirm Password</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="confirm_password" name="confirm_password"
+                                   placeholder="Re-enter password" required autocomplete="new-password">
+                            <button type="button" class="toggle-pw" onclick="togglePassword('confirm_password', this)">👁</button>
+                        </div>
+                    </div>
+
+                    <!-- Live password strength bar -->
+                    <div class="pw-strength-wrap" id="pwStrengthWrap" style="display:none">
+                        <div class="pw-strength-bar">
+                            <div class="pw-strength-fill" id="pwStrengthFill"></div>
+                        </div>
+                        <span class="pw-strength-label" id="pwStrengthLabel"></span>
+                    </div>
+
+                    <button type="submit" class="btn-auth">Create Account →</button>
+                </form>
+
+                <p class="auth-switch">
+                    Already have an account? <a href="/login">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁';
+            }
+        }
+
+        // Password strength meter
+        const pwInput = document.getElementById('password');
+        const wrap    = document.getElementById('pwStrengthWrap');
+        const fill    = document.getElementById('pwStrengthFill');
+        const label   = document.getElementById('pwStrengthLabel');
+
+        const levels = [
+            { min: 0,  max: 3,  cls: 'weak',   text: 'Weak',      color: '#ef4444', width: '25%' },
+            { min: 3,  max: 5,  cls: 'fair',   text: 'Fair',      color: '#f59e0b', width: '50%' },
+            { min: 5,  max: 8,  cls: 'good',   text: 'Good',      color: '#3b82f6', width: '75%' },
+            { min: 8,  max: 99, cls: 'strong', text: 'Strong 💪', color: '#22c55e', width: '100%' },
+        ];
+
+        function scorePassword(p) {
+            let s = p.length;
+            if (/[A-Z]/.test(p)) s += 2;
+            if (/[0-9]/.test(p)) s += 2;
+            if (/[^A-Za-z0-9]/.test(p)) s += 3;
+            return s;
+        }
+
+        pwInput.addEventListener('input', () => {
+            const val = pwInput.value;
+            if (!val) { wrap.style.display = 'none'; return; }
+            wrap.style.display = 'flex';
+            const score = scorePassword(val);
+            const lvl = levels.find(l => score >= l.min && score < l.max) || levels[3];
+            fill.style.width = lvl.width;
+            fill.style.background = lvl.color;
+            label.textContent = lvl.text;
+            label.style.color = lvl.color;
+        });
+    </script>
+</body>
+</html>

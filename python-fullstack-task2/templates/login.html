@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – User Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-split">
+
+        <!-- Left panel -->
+        <div class="auth-panel">
+            <div class="auth-brand">
+                <div class="brand-mark">UM</div>
+                <span class="brand-name">UserBase</span>
+            </div>
+            <div class="auth-hero">
+                <h1>Manage your<br><em>team with ease.</em></h1>
+                <p>A full-stack user management platform built on Python, Flask & SQLite.</p>
+                <div class="feature-pills">
+                    <span>🔐 Secure Auth</span>
+                    <span>📋 User Records</span>
+                    <span>⚡ Fast SQLite</span>
+                </div>
+            </div>
+            <div class="auth-panel-deco">
+                <div class="deco-circle c1"></div>
+                <div class="deco-circle c2"></div>
+                <div class="deco-circle c3"></div>
+            </div>
+        </div>
+
+        <!-- Right form -->
+        <div class="auth-form-side">
+            <div class="auth-form-card">
+
+                <div class="form-header">
+                    <h2>Welcome back</h2>
+                    <p>Sign in to your account</p>
+                </div>
+
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    <div class="flash-stack">
+                      {% for cat, msg in messages %}
+                        <div class="flash flash-{{ cat }}">
+                          <span class="flash-icon">
+                            {% if cat == 'success' %}✅{% elif cat == 'error' %}❌{% elif cat == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+                          </span>
+                          {{ msg }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/login" class="auth-form">
+                    <div class="field">
+                        <label for="identifier">Username or Email</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="identifier" name="identifier"
+                                   placeholder="your_username or email@example.com" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">🔑</span>
+                            <input type="password" id="password" name="password"
+                                   placeholder="Enter your password" required autocomplete="current-password">
+                            <button type="button" class="toggle-pw" onclick="togglePassword('password', this)">👁</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth">Sign In →</button>
+                </form>
+
+                <p class="auth-switch">
+                    Don't have an account? <a href="/register">Create one</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard – User Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dashboard-page">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="brand-mark small">UM</div>
+            <span>UserBase</span>
+        </div>
+        <div class="nav-right">
+            <div class="nav-user">
+                <div class="nav-avatar">{{ session['username'][0].upper() }}</div>
+                <span class="nav-username">{{ session['username'] }}</span>
+            </div>
+            <a href="/logout" class="btn-logout">Sign out</a>
+        </div>
+    </nav>
+
+    <div class="dash-container">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-stack">
+              {% for cat, msg in messages %}
+                <div class="flash flash-{{ cat }}">
+                  <span class="flash-icon">
+                    {% if cat == 'success' %}✅{% elif cat == 'error' %}❌{% elif cat == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+                  </span>
+                  {{ msg }}
+                  <button class="flash-close" onclick="this.parentElement.remove()">✕</button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Stats bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <span class="stat-num">{{ users|length }}</span>
+                <span class="stat-label">Total Users</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num">{{ users|selectattr('department')|list|length }}</span>
+                <span class="stat-label">Assigned</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num">{{ users|map(attribute='department')|select|unique|list|length }}</span>
+                <span class="stat-label">Departments</span>
+            </div>
+        </div>
+
+        <!-- Add User Form -->
+        <div class="card">
+            <h2 class="card-title">
+                <span class="card-icon">➕</span> Add New User
+            </h2>
+            <form method="POST" action="/" class="dash-form">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Full Name <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <span class="input-icon">👤</span>
+                            <input type="text" name="name" placeholder="e.g. Priya Sharma" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Email Address <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <span class="input-icon">✉️</span>
+                            <input type="email" name="email" placeholder="e.g. priya@company.com" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Phone Number</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">📞</span>
+                            <input type="text" name="phone" placeholder="e.g. +91 98765 43210">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Department</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">🏢</span>
+                            <select name="department">
+                                <option value="">-- Select --</option>
+                                <option>Engineering</option>
+                                <option>Design</option>
+                                <option>Marketing</option>
+                                <option>Sales</option>
+                                <option>HR</option>
+                                <option>Finance</option>
+                                <option>Operations</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Add User →</button>
+            </form>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card">
+            <h2 class="card-title">
+                <span class="card-icon">📋</span> All Users
+                <span class="count-badge">{{ users|length }}</span>
+            </h2>
+
+            {% if users %}
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Department</th>
+                            <th>Added</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td><span class="id-tag">#{{ user['id'] }}</span></td>
+                            <td><strong>{{ user['name'] }}</strong></td>
+                            <td><a href="mailto:{{ user['email'] }}" class="email-link">{{ user['email'] }}</a></td>
+                            <td class="muted">{{ user['phone'] or '—' }}</td>
+                            <td>
+                                {% if user['department'] %}
+                                <span class="dept-tag">{{ user['department'] }}</span>
+                                {% else %}<span class="muted">—</span>{% endif %}
+                            </td>
+                            <td class="muted small">{{ user['created_at'][:10] if user['created_at'] else '—' }}</td>
+                            <td>
+                                <form method="POST" action="/delete/{{ user['id'] }}"
+                                      onsubmit="return confirm('Delete {{ user['name'] }}?')">
+                                    <button type="submit" class="btn-del">🗑 Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-ico">📭</div>
+                <p>No users yet — add your first one above!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <footer class="dash-footer">
+            🐍 Python + Flask + SQLite &nbsp;|&nbsp; Maincrafts Technology Internship – Task 1
+        </footer>
+    </div>
+
+</body>
+</html>
