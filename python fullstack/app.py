@@ -7,8 +7,6 @@ app.secret_key = 'dev_secret_key_change_in_production'
 
 DATABASE = 'database.db'
 
-# ─── DB Helper ────────────────────────────────────────────────────────────────
-
 def get_db():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
